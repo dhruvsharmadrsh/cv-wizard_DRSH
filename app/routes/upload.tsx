@@ -4,7 +4,6 @@ import Navbar from "~/components/Navbar";
 import FileUploader from "~/components/FileUploader";
 import { usePuterStore } from "~/lib/puter";
 import { useNavigate } from "react-router";
-import { convertPdfToImage } from "~/lib/pdf2img";
 import { generateUUID } from "~/lib/utils";
 import { prepareInstructions } from "../../constants";
 
@@ -212,6 +211,7 @@ const Upload = () => {
             }
 
             setStatusText('PROCESSING FORMAT...');
+            const { convertPdfToImage } = await import("~/lib/pdf2img");
             const imageFile = await convertPdfToImage(file);
             if(!imageFile.file) {
                 setStatusText('ERROR: FORMAT CONVERSION FAILED');
