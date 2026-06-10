@@ -2,8 +2,7 @@ import type { Config } from "@react-router/dev/config";
 import { vercelPreset } from "@vercel/react-router/vite";
 
 export default {
-  // Config options...
-  // Server-side render by default, to enable SPA mode set this to `false`
-  ssr: true,
+  // SPA mode — this app is fully client-side (Puter.js handles auth, AI, storage)
+  ssr: false,
   presets: [vercelPreset()],
 } satisfies Config;
