@@ -5,10 +5,7 @@ import { usePuterStore } from "~/lib/puter";
 import { Link, useNavigate } from "react-router";
 import { useEffect, useState, useRef, useCallback } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "~/home.css";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -225,6 +222,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loadingResumes, setLoadingResumes] = useState(false);
+  const [scrollTriggerReady, setScrollTriggerReady] = useState(false);
 
   // Refs for GSAP
   const heroRef = useRef<HTMLDivElement>(null);
@@ -238,6 +236,14 @@ export default function Home() {
   const emptyRef = useRef<HTMLDivElement>(null);
   const howRef = useRef<HTMLDivElement>(null);
   const trustRef = useRef<HTMLDivElement>(null);
+
+  // Dynamically load ScrollTrigger on the client only (prevents SSR crash on Vercel)
+  useEffect(() => {
+    import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+      gsap.registerPlugin(ScrollTrigger);
+      setScrollTriggerReady(true);
+    });
+  }, []);
 
   useEffect(() => {
     if (!auth.isAuthenticated) navigate("/auth?next=/");
@@ -258,6 +264,7 @@ export default function Home() {
 
   /* ---- GSAP Master Timeline ---- */
   useEffect(() => {
+    if (!scrollTriggerReady) return;
     const ctx = gsap.context(() => {
       // Hero entrance timeline
       const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
@@ -576,7 +583,7 @@ export default function Home() {
     });
 
     return () => ctx.revert();
-  }, [loadingResumes, resumes]);
+  }, [loadingResumes, resumes, scrollTriggerReady]);
 
   return (
     <main className="home-page">
